@@ -7,9 +7,29 @@ export default defineSchema({
     email: v.string(),
     userName: v.string(),
     firstName: v.string(),
-    LastName: v.string(),
+    lastName: v.string(),
     photo: v.string(),
-  }).searchIndex("clerk_id", {
-    searchField: "clerkId",
+  }).index("by_clerk_id", ["clerkId"]),
+  category: defineTable({
+    name: v.string(),
+  }),
+  events: defineTable({
+    title: v.string(),
+    description: v.string(),
+    location: v.string(),
+    isFree: v.boolean(),
+    imageUrl: v.string(),
+    startDateTime: v.any(),
+    endDateTime: v.any(),
+    price: v.string(),
+    url: v.string(),
+    categoryId: v.id("category"),
+    organizerId: v.id("users"),
+  }),
+  order: defineTable({
+    stripeId: v.string(),
+    totalAmount: v.string(),
+    eventId: v.id("events"),
+    buyer: v.id("users"),
   }),
 });
