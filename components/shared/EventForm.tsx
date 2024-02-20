@@ -1,9 +1,13 @@
 "use client";
 
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+import Dropdown from "./Dropdown";
+import FileUploader from "./FileUploader";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,14 +19,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { eventFormSchema } from "@/lib/validator";
 import { eventDefaultValues } from "@/constants";
-import Dropdown from "./Dropdown";
 import { Textarea } from "../ui/textarea";
-import FileUploader from "./FileUploader";
-import { useState } from "react";
 import { Calendar, CircleDollarSign, Link, MapPin } from "lucide-react";
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface EventFormProps {
@@ -30,8 +28,6 @@ interface EventFormProps {
   type: "Create" | "Update";
 }
 const EventForm = ({ userId, type }: EventFormProps) => {
-  const [startDate, setStartDate] = useState(new Date());
-
   const [files, setFiles] = useState<File[]>([]);
   const initialValues = eventDefaultValues;
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -259,8 +255,13 @@ const EventForm = ({ userId, type }: EventFormProps) => {
             )}
           />
         </div>
-        <Button type="submit" size={"lg"} disabled={form.formState.isSubmitted} className="button col-span-2 w-full">
-          {form.formState.isSubmitted?("Submitting..."):(`${type} Event`)}
+        <Button
+          type="submit"
+          size={"lg"}
+          disabled={form.formState.isSubmitted}
+          className="button col-span-2 w-full"
+        >
+          {form.formState.isSubmitted ? "Submitting..." : `${type} Event`}
         </Button>
       </form>
     </Form>
