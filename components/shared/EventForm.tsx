@@ -22,12 +22,23 @@ import { eventDefaultValues } from "@/constants";
 import { Textarea } from "../ui/textarea";
 import { Calendar, CircleDollarSign, Link, MapPin } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useUploadThing } from "@/lib/uploadthing";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 interface EventFormProps {
   userId: string;
   type: "Create" | "Update";
 }
 const EventForm = ({ userId, type }: EventFormProps) => {
+
+  const router = useRouter();
+
+
+  const createEvent = useMutation(api.events.createEvent);
+
+  const { startUpload } = useUploadThing("imageUploader");
   const [files, setFiles] = useState<File[]>([]);
   const initialValues = eventDefaultValues;
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -35,10 +46,38 @@ const EventForm = ({ userId, type }: EventFormProps) => {
     defaultValues: initialValues,
   });
 
-  function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    const eventData = values;
+    let uploadedImageUrl = values.imageUrl;
+    if (files.length > 0) {
+      const uploadedImage = await startUpload(files);
+      if (!uploadedImage) {
+        return;
+      }
+      uploadedImageUrl = uploadedImage[0].url;
+      console.log(uploadedImageUrl);
+    }
+    if (type === "Create") {
+      createEvent({
+        title: values.title,
+        description: values.description,
+        startDateTime: values.startDateTime.toString(),
+        endDateTime: values.endDateTime.toString(),
+        location: values.location,
+        imageUrl: values.imageUrl,
+        price: values.price,
+        userId,
+        categoryId: values.categoryId,
+        url: values.url,
+        isFree: values.isFree,
+      })
+        .then((event) => {
+          form.reset();
+          router.push(`/events/${event}`)
+
+        })
+        .catch((err) => console.log(err));
+    }
   }
   return (
     <Form {...form}>
@@ -258,10 +297,10 @@ const EventForm = ({ userId, type }: EventFormProps) => {
         <Button
           type="submit"
           size={"lg"}
-          disabled={form.formState.isSubmitted}
+          disabled={form.formState.isSubmitting}
           className="button col-span-2 w-full"
         >
-          {form.formState.isSubmitted ? "Submitting..." : `${type} Event`}
+          {form.formState.isSubmitting ? "Submitting..." : `${type} Event`}
         </Button>
       </form>
     </Form>

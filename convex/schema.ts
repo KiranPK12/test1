@@ -23,8 +23,8 @@ export default defineSchema({
     endDateTime: v.any(),
     price: v.string(),
     url: v.string(),
-    categoryId: v.id("category"),
-    organizerId: v.id("users"),
+    categoryId: v.string(),
+    organizerId: v.string(),
   }),
   order: defineTable({
     stripeId: v.string(),
