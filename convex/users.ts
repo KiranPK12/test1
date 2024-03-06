@@ -1,8 +1,6 @@
 import { v } from "convex/values";
 import { QueryCtx, internalMutation } from "./_generated/server";
-import { Doc } from "./_generated/dataModel";
-import { UserJSON } from "@clerk/clerk-sdk-node";
-import { userAgent } from "next/server";
+
 
 export const createUser = internalMutation({
   args: {

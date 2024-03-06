@@ -26,15 +26,15 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { Id } from "@/convex/_generated/dataModel";
+import { userQuery } from "@/convex/users";
 
 interface EventFormProps {
   userId: string;
   type: "Create" | "Update";
 }
 const EventForm = ({ userId, type }: EventFormProps) => {
-
   const router = useRouter();
-
 
   const createEvent = useMutation(api.events.createEvent);
 
@@ -47,7 +47,6 @@ const EventForm = ({ userId, type }: EventFormProps) => {
   });
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    const eventData = values;
     let uploadedImageUrl = values.imageUrl;
     if (files.length > 0) {
       const uploadedImage = await startUpload(files);
@@ -55,7 +54,6 @@ const EventForm = ({ userId, type }: EventFormProps) => {
         return;
       }
       uploadedImageUrl = uploadedImage[0].url;
-      console.log(uploadedImageUrl);
     }
     if (type === "Create") {
       createEvent({
@@ -64,17 +62,16 @@ const EventForm = ({ userId, type }: EventFormProps) => {
         startDateTime: values.startDateTime.toString(),
         endDateTime: values.endDateTime.toString(),
         location: values.location,
-        imageUrl: values.imageUrl,
+        imageUrl: uploadedImageUrl,
         price: values.price,
         userId,
-        categoryId: values.categoryId,
+        categoryId: values.categoryId as Id<"category">,
         url: values.url,
         isFree: values.isFree,
       })
         .then((event) => {
           form.reset();
-          router.push(`/events/${event}`)
-
+          router.push(`/events/${event}`);
         })
         .catch((err) => console.log(err));
     }

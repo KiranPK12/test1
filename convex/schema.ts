@@ -10,9 +10,11 @@ export default defineSchema({
     lastName: v.string(),
     photo: v.string(),
   }).index("by_clerk_id", ["clerkId"]),
+
   category: defineTable({
     name: v.string(),
   }),
+
   events: defineTable({
     title: v.string(),
     description: v.string(),
@@ -23,9 +25,11 @@ export default defineSchema({
     endDateTime: v.any(),
     price: v.string(),
     url: v.string(),
-    categoryId: v.string(),
-    organizerId: v.string(),
+    categoryId: v.id("category"),
+    organizerId: v.id("users"),
   }),
+
+  // TODO:check for data types of id
   order: defineTable({
     stripeId: v.string(),
     totalAmount: v.string(),
